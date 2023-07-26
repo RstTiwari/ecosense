@@ -29,6 +29,11 @@ module.exports = function (app){
     app
       .route("/idealake/uploadImage")
       .post(upload.single("image"),ProductController.uploadImage);
+
     app.route("/idealake/addProduct").post(ProductController.addProduct);
+    app.route("/idealake/updateProduct").post(ProductController.updaterPoduct);
+    app.route("/idealake/deleteProduct").post(ProductController.deleteProduct);
+
+
 
 }

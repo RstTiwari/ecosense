@@ -16,11 +16,31 @@ const ProductService = {
     }
     return data;
   },
-  addProduct:async function (obj){
-    let data = null
+  addProduct: async function (obj) {
+    let data = null;
     try {
       data = new ProductModal(obj);
       await data.save();
+    } catch (error) {
+      console.error(error);
+    }
+    return data;
+  },
+
+  updateProduct: async function (filter, updateObj) {
+    let data = null;
+    try {
+      data = ProductModal.updateOne(filter, updateObj);
+    } catch (error) {
+      console.log(error);
+    }
+    return data;
+  },
+
+  deleteProduct:async function (filter){
+    let data = null 
+    try {
+      data = await ProductModal.deleteOne(filter)
     } catch (error) {
       console.error(error);
     }

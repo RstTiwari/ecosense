@@ -19,7 +19,7 @@ const ProductController = {
       }
 
       let filter = {}; // filters can be passed here
-      let select = {_id:0,_v:0};
+      let select = { _id: 0, _v: 0 };
       let sort = { _id: -1 };
       let skip = (pageNo - 1) * limit;
 
@@ -50,40 +50,40 @@ const ProductController = {
     }
   },
 
-  uploadImage:async function (req,res){
+  uploadImage: async function (req, res) {
     try {
-        if(!req.file){
-            throw new Error("no file is attached")
-        }
-        let filename = req.file.path
-        let folder = filename
-        let uploadImage = await cloudinary.uploader.upload(filename ,{public_id:folder});
+      if (!req.file) {
+        throw new Error("no file is attached");
+      }
+      let filename = req.file.path;
+      let folder = filename;
+      let uploadImage = await cloudinary.uploader.upload(filename, {
+        public_id: folder,
+      });
 
-        if(!uploadImage.public_id){
-            throw new Error("failed to upload image")
-        }
+      if (!uploadImage.public_id) {
+        throw new Error("failed to upload image");
+      }
 
-        let response = {
-            success:1,
-            data:uploadImage.url
-        }
+      let response = {
+        success: 1,
+        data: uploadImage.url,
+      };
 
-        res.send(response)
-        fs.unlinkSync(filename)
-
+      res.send(response);
+      fs.unlinkSync(filename);
     } catch (error) {
-        console.error(error);
-        let response = {
+      console.error(error);
+      let response = {
         success: 0,
-        message:error.message
-        };
-        res.send(response);
-        fs.unlinkSync(filename);
+        message: error.message,
+      };
+      res.send(response);
+      fs.unlinkSync(filename);
     }
   },
 
   addProduct: async function (req, res) {
-
     try {
       let { title, desc, price, image } = req.body;
       if (!title) {
@@ -101,7 +101,7 @@ const ProductController = {
       if (!image) {
         throw new Error("image url is missing");
       }
-      let productId = ProductHelper.getProductCounter()
+      let productId = ProductHelper.getProductCounter();
       let newProduct = {
         productId: productId,
         title: title,
@@ -130,8 +130,89 @@ const ProductController = {
 
       res.send(response);
     }
-
   },
+
+  updaterPoduct: async function (req, res) {
+    try {
+      let { productId, title, desc, price ,image} = req.body;
+      if (!productId) {
+        throw new Error("please provide valid ProductId");
+      }
+      if (!title) {
+        throw new Error("please provide valid title");
+      }
+      if (!desc) {
+        throw new Error("please provide valid desc");
+      }
+      if (!price) {
+        throw new Error("please provide valid price");
+      }
+      if (!image) {
+        throw new Error("please provide valid image");
+      }
+
+      let filter = { productId: productId };
+      let updateObj = {
+        $set: {
+          title: title,
+          desc: desc,
+          price: price,
+          image: image,
+        },
+      };
+
+      let updatedData = await ProductService.updateProduct(filter, updateObj);
+
+      if (!updatedData || updatedData.modifiedCount !== 1) {
+        throw new Error("failed to update Data");
+      }
+      let response = {
+        success: 1,
+        message: "updated successfully",
+      };
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      let response = {
+        success: 0,
+        message: error.message,
+      };
+      res.send(response);
+    }
+  },
+
+  deleteProduct: async function (req, res){
+    try {
+      let {productId} = req.body;
+
+      if (!productId) {
+        throw new Error("please provide valid prodcutId");
+      }
+
+      let filter = {productId:productId}
+      
+      let deletedProduct = await ProductService.deleteProduct(filter);
+
+      if(!deletedProduct || deletedProduct.deletedCount !== 1){
+        throw new Error("failed to delete product")
+      }
+
+      let response = {
+        success:1,
+        message:"deleted successfully"
+      };
+      res.send(response)
+    } catch (error) {
+
+      console.error(error);
+      let response = {
+        success:0,
+        message:error.message
+      };
+
+      res.send(response)
+    }
+  }
 };
 
 module.exports = ProductController;
