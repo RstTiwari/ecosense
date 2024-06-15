@@ -13,34 +13,35 @@ require("dotenv").config();
 var env = "prod";
 var port = "4003";
 
-
 app.use(bodyParser.json());
 app.use(cors());
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
+    bodyParser.urlencoded({
+        extended: true,
+    })
 );
 
-var routes = require("./app/routes");
-routes(app);
+const shopRoutes = require("./app/routes/shop");
+const reportRoutes = require("./app/routes/report");
+
+app.use("/api", shopRoutes);
+app.use("/api", reportRoutes);
 
 // connection to cloudinary
 cloudinary.config({
-  cloud_name: process.env.cloudinaryName,
-  api_key: process.env.apiKey,
-  api_secret: process.env.apiSecret,
+    cloud_name: process.env.cloudinaryName,
+    api_key: process.env.apiKey,
+    api_secret: process.env.apiSecret,
 });
 
-
 mongoose
-  .connect(process.env.MDKEY, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() =>
-    app.listen(port, () =>
-      console.log(`Server Running on Port: http://localhost:${port}`)
+    .connect(process.env.MDKEY, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() =>
+        app.listen(port, () =>
+            console.log(`Server Running on Port: http://localhost:${port}`)
+        )
     )
-  )
-  .catch((error) => console.log(`${error} did not connect`));
+    .catch((error) => console.log(`${error} did not connect`));

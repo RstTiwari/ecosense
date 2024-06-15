@@ -1,28 +1,29 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const mongooseAutoPopulate = require("mongoose-autopopulate");
 
-const productSchema = mongoose.Schema({
-  productId: {
-    type: Number,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  desc:{
-    type:String,
-    required:true
-  },
-  image: {
-    type: String,
-    required: true,
-  },
-
-  price: {
-    type: Number,
-    required: true,
-  },
+const ProductSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    category: {
+        type: String,
+        required: true,
+    },
+    price: {
+        type: Number,
+        required: true,
+    },
+    shopId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Shop",
+        required: true,
+    },
+    salesCount: {
+        type: Number,
+        default: 0,
+    },
 });
 
-
-module.exports = mongoose.model("product",productSchema,"product")
+ProductSchema.plugin(mongooseAutoPopulate);
+module.exports = mongoose.model("Product", ProductSchema);
